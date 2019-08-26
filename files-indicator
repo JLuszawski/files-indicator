@@ -171,31 +171,14 @@ class FilesIndicator(object):
 
     def get_recent_files(self,*args):
         manager = gtk.RecentManager.get_default()
-        # [ *** JL ***
-        self.temp_recent_files = [ [item.get_short_name(), urllib.parse.unquote(item.get_uri().replace('file://','')), item.get_icon(12), item.get_modified() ] for item in manager.get_items() if item.exists() ]
-        self.temp_recent_files.sort(key=lambda x: x[3])
+        recent_files = [ [item.get_short_name(), urllib.parse.unquote(item.get_uri().replace('file://','')), item.get_icon(16), item.get_modified() ] for item in manager.get_items() if item.exists() ]
+        recent_files.sort(key=lambda x: x[3])
             #sort by "modified" attribute to get most recent files
-        self.temp_recent_files = self.temp_recent_files[-self.max_items:]
-        self.sort_menu( self.temp_recent_files, column_name="basename" )
-			# TODO: hardcoded "basename" as sort criteria, should be set by a config option
-        # *** JL *** ]
-        try:
-            files = OrderedDict()
-            for index,item in enumerate(manager.get_items(),1):
-                    uri = item.get_uri()
-                    uri_decoded = urllib.parse.unquote(uri)
-                    filepath = uri_decoded.replace('file://','')
-                    if not os.path.exists(filepath): continue
-                    basename = os.path.basename(uri_decoded)
-                    files[basename] = filepath
-                    if index >= self.max_items:
-                        break
-        except Exception as e:
-            print(e)
-            return None
-        finally:  return files
+        recent_files = recent_files[-self.max_items:]
+        self.sort_menu( recent_files, column_name="basename" )
+			# TODO: "basename" is hardcoded as sort criteria, should be set by a config option
+        return recent_files
         
-    # [ *** JL ***
     def sort_menu(self, menu_data, column_name="", column_number=255):
         columns = { "basename": 0, "path": 1, "modification time": 3 }
         try:
@@ -211,8 +194,7 @@ class FilesIndicator(object):
         except:
             pass
                 # leave unsorted
-    # *** JL *** ]
-
+    
     def callback(self,*args):
         self.update()
 
@@ -243,8 +225,6 @@ class FilesIndicator(object):
         else:
             recent = self.add_submenu(self.app_menu,'Recent Files')
 
-        recent_dict = self.get_recent_files()
-        
         content = [recent,gtk.ImageMenuItem,'gtk-add',
                    'Add to Recent Files',self.add_recent,[None]
         ]      
@@ -261,8 +241,8 @@ class FilesIndicator(object):
         ]
         self.add_menu_item(*content)
         
-        # [ *** JL ***
-        if not self.temp_recent_files :
+        recent_list = self.get_recent_files()
+        if not recent_list :
             content = [recent,gtk.MenuItem,None,
                        'No items',None,None
             ]
@@ -272,36 +252,13 @@ class FilesIndicator(object):
                 last = i
             last.set_sensitive(False)
         else:
-            for [name, uri, icon, last_modified] in self.temp_recent_files :
+            for [name, uri, icon, last_modified] in recent_list :
                 content = [recent, gtk.ImageMenuItem,
                            icon, name[:self.name_length],
                            self.open_item, [uri]
                 ]
                 self.add_menu_item(*content)
-        content = [recent,gtk.SeparatorMenuItem,
-                   None,None,
-                   None,[None]
-        ]
-        self.add_menu_item(*content)
-        # *** JL *** ]
         
-        if not recent_dict:
-            content = [recent,gtk.MenuItem,None,
-                       'No items',None,None
-            ]
-            self.add_menu_item(*content)
-            last = None
-            for i in recent.get_children():
-                last = i
-            last.set_sensitive(False)
-        else:
-            for name,data in recent_dict.items():
-                icon = self.get_file_icon(data)
-                content = [recent, gtk.ImageMenuItem,
-                           icon, name[:self.name_length],
-                           self.open_item, [data]
-                ]
-                self.add_menu_item(*content)
         if self.recent_files_in_main_menu :
             content = [recent,gtk.SeparatorMenuItem,
                    None,None,
