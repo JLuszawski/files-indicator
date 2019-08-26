@@ -131,7 +131,8 @@ class FilesIndicator(object):
             menu_item = gtk.SeparatorMenuItem()
         if action:
             menu_item.connect('activate', action, *args)
-
+        if isinstance(args[0],str) and os.path.exists(args[0]):
+            menu_item.set_tooltip_text(args[0])
         menu_obj.append(menu_item)
         menu_item.show()
 
@@ -244,7 +245,7 @@ class FilesIndicator(object):
         recent_list = self.get_recent_files()
         if not recent_list :
             content = [recent,gtk.MenuItem,None,
-                       'No items',None,None
+                       'No items',None,[None]
             ]
             self.add_menu_item(*content)
             last = None
@@ -307,7 +308,7 @@ class FilesIndicator(object):
                 self.add_menu_item(*content)
         else:
             content = [bookmarks,gtk.MenuItem,None,
-                       'No items',None,None
+                       'No items',None,[None]
             ]
             self.add_menu_item(*content)
             last = None
@@ -335,7 +336,7 @@ class FilesIndicator(object):
         self.add_menu_item(*content)
 
         content = [places,gtk.MenuItem,None,
-                   'Standard Dirs',None,None
+                   'Standard Dirs',None,[None]
         ]
         self.add_menu_item(*content)
         last = None
@@ -357,7 +358,7 @@ class FilesIndicator(object):
         self.add_menu_item(*content)
 
         content = [places,gtk.MenuItem,None,
-                   'Pinned Dirs',None,None
+                   'Pinned Dirs',None,[None]
         ]
         self.add_menu_item(*content)
         last = None
@@ -378,7 +379,7 @@ class FilesIndicator(object):
                 self.add_menu_item(*content)
         else:
             content = [places,gtk.MenuItem,None,
-                       'No items',None,None
+                       'No items',None,[None]
             ]
             self.add_menu_item(*content)
             last = None
@@ -426,7 +427,7 @@ class FilesIndicator(object):
                 self.add_menu_item(*content)
         else:
             content = [links_menu,gtk.MenuItem,None,
-                       'No items',None,None
+                       'No items',None,[None]
             ]
             self.add_menu_item(*content)
             last = None
