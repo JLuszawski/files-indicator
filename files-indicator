@@ -225,8 +225,6 @@ class FilesIndicator(object):
         else:
             recent = self.add_submenu(self.app_menu,'Recent Files')
 
-        recent_dict = self.get_recent_files()
-        
         content = [recent,gtk.ImageMenuItem,'gtk-add',
                    'Add to Recent Files',self.add_recent,[None]
         ]      
@@ -261,12 +259,12 @@ class FilesIndicator(object):
                 ]
                 self.add_menu_item(*content)
         
-        # if self.recent_files_in_main_menu :
-            # content = [recent,gtk.SeparatorMenuItem,
-                   # None,None,
-                   # None,[None]
-            # ]
-            # self.add_menu_item(*content)
+        if self.recent_files_in_main_menu :
+            content = [recent,gtk.SeparatorMenuItem,
+                   None,None,
+                   None,[None]
+            ]
+            self.add_menu_item(*content)
         
 
         # Pinned files
